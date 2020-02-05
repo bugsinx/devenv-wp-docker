@@ -16,7 +16,7 @@ services:
       - wordpress-network
 
   wordpress:
-    image: wordpress
+    image: wordpress:5.3.2-php7.4-fpm-alpine
     restart: unless-stopped
     ports:
       - 8089:80
