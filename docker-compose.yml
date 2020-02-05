@@ -1,37 +1,35 @@
 version: '3.7'
 
 services:
-
-  wordpress:
-    image: wordpress
-    restart: always
-    ports:
-      - 8080:80
-    environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
-      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
-      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
-    volumes:
-      - wordpress:/var/www/html
-
-  db:
-    image: mysql:5.7
-    restart: always
+  mariadb:
+    image: mariadb:latest
     environment:
       MYSQL_DATABASE: ${WORDPRESS_DB_NAME}
       MYSQL_USER: ${WORDPRESS_DB_USER}
       MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD}
-      MYSQL_RANDOM_ROOT_PASSWORD: ${MYSQL_RANDOM_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    restart: unless-stopped
     volumes:
-      - db:/var/lib/mysql
+      - ./db_data:/var/lib/mysql
+      - ./db_dump:/docker-entrypoint-initdb.d
+    networks:
+      - wordpress-network
 
-volumes:
   wordpress:
-    driver: local
-    driver_opts:
-      type: none
-      device: "${ROOT_PATH}src"
-      o: bind
-  db:
-    
+    image: wordpress
+    restart: unless-stopped
+    ports:
+      - 8089:80
+    environment:
+      WORDPRESS_DB_HOST: mariadb
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+    volumes:
+      - ./src:/var/www/html
+    networks:
+      - wordpress-network
+
+networks:
+  wordpress-network:
+      driver: bridge

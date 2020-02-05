@@ -1,5 +1,7 @@
 .env
 src/*
 !src/.gitkeep
-db/*
-!db/.gitkeep
+db_data/*
+!db_data/.gitkeep
+db_dump/*
+!db_dump/.gitkeep
