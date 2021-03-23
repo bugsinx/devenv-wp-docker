@@ -12,24 +12,41 @@ services:
     volumes:
       - ./db_data:/var/lib/mysql
       - ./db_dump:/docker-entrypoint-initdb.d
+    ports:
+      - "8025:3306"
     networks:
-      - wordpress-network
+      local:
+        ipv4_address: 172.28.6.4
 
   wordpress:
-    image: wordpress:5.3.2-php7.4-fpm-alpine
+    image: wordpress:latest
     restart: unless-stopped
     ports:
-      - 8089:80
+      - "8026:80"
     environment:
       WORDPRESS_DB_HOST: mariadb
       WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
       WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
       WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
     volumes:
-      - ./src:/var/www/html
+      - type: volume
+        source: app_data
+        target: /var/www/html
     networks:
-      - wordpress-network
+      local:
+        ipv4_address: 172.28.6.5
+
+volumes:
+  app_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: "${PWD}/src"
+      o: bind
 
 networks:
-  wordpress-network:
-      driver: bridge
+  local:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.6.0/24
