@@ -29,20 +29,10 @@ services:
       WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
       WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
     volumes:
-      - type: volume
-        source: app_data
-        target: /var/www/html
+      - ./src:/var/www/html
     networks:
       local:
         ipv4_address: 172.28.6.5
-
-volumes:
-  app_data:
-    driver: local
-    driver_opts:
-      type: none
-      device: "${PWD}/src"
-      o: bind
 
 networks:
   local:
